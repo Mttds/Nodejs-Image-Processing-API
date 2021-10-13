@@ -4,7 +4,7 @@ import express from 'express';
 // an express object and thus it does not have
 // default types added with: npm i --save-dev @types/express
 const logger = (req:express.Request, res:express.Response, next:Function) :void =>  {
-    console.log(`[INFO] - visited ${req.url}`);
+    console.log(`[INFO] - HTTP status ${res.statusCode}`);
     next();
 };
 
