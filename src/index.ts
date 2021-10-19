@@ -15,10 +15,10 @@ app.set('view engine', 'ejs');
 // set the static folder for serving images
 // the virtual path /api is used because the
 // api/images routes has the get('/'...) relative to api
-app.use('/api', express.static('assets'))
+app.use('/api', express.static('assets'));
 
 app.get('/', (req, res) => {
-  console.log('/ - Go to /api/images for the Image Processing API.')
+  console.log('/ - Go to /api/images for the Image Processing API.');
   res.send('/ - Go to /api/images for the Image Processing API.');
 });
 app.use('/api', routes);

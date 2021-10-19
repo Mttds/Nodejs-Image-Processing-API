@@ -55,12 +55,26 @@ var Image = /** @class */ (function () {
     function Image(image, width, height) {
         var _this = this;
         this.checkFile = function (fullpath) { return __awaiter(_this, void 0, void 0, function () {
+            var check, e_1;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, fs_1.promises.stat(fullpath).catch(function (e) { return false; })];
+                    case 0:
+                        console.log("checkFile call...");
+                        _a.label = 1;
                     case 1:
-                        _a.sent();
-                        return [2 /*return*/];
+                        _a.trys.push([1, 3, , 4]);
+                        return [4 /*yield*/, fs_1.promises.stat(fullpath)];
+                    case 2:
+                        check = _a.sent();
+                        console.log(check, check.isFile());
+                        if (check.isFile())
+                            return [2 /*return*/, Promise.resolve(true)];
+                        return [2 /*return*/, Promise.resolve(false)];
+                    case 3:
+                        e_1 = _a.sent();
+                        console.log(e_1);
+                        return [2 /*return*/, Promise.resolve(false)];
+                    case 4: return [2 /*return*/];
                 }
             });
         }); };
@@ -104,9 +118,7 @@ var Image = /** @class */ (function () {
                     case 0:
                         console.log("Checking image " + this.getImagePath());
                         return [4 /*yield*/, this.checkFile(this.getImagePath())];
-                    case 1:
-                        _a.sent();
-                        return [2 /*return*/, Promise.resolve(true)];
+                    case 1: return [2 /*return*/, _a.sent()];
                 }
             });
         });
@@ -118,44 +130,43 @@ var Image = /** @class */ (function () {
                     case 0:
                         console.log("Checking image " + this.getThumbsImagePath());
                         return [4 /*yield*/, this.checkFile(this.getThumbsImagePath())];
-                    case 1:
-                        _a.sent();
-                        return [2 /*return*/, Promise.resolve(true)];
+                    case 1: return [2 /*return*/, _a.sent()];
                 }
             });
         });
     };
     Image.prototype.sharpImage = function () {
         return __awaiter(this, void 0, void 0, function () {
-            var newData, _a, _b, _c, _d, err_1;
-            return __generator(this, function (_e) {
-                switch (_e.label) {
+            var newData, _a, _b, err_1;
+            return __generator(this, function (_c) {
+                switch (_c.label) {
                     case 0:
                         console.log("Resizing image " + this.image + " into " + this.getThumbsImagePath());
-                        _e.label = 1;
+                        _c.label = 1;
                     case 1:
-                        _e.trys.push([1, 8, , 9]);
+                        _c.trys.push([1, 8, , 9]);
                         return [4 /*yield*/, this.checkThumbsImage()];
                     case 2:
-                        if (!_e.sent()) return [3 /*break*/, 7];
+                        if (!!(_c.sent())) return [3 /*break*/, 6];
                         console.log("Image " + this.image + " does not exist. Processing...");
                         console.log("Width: " + this.width + " | Height: " + this.height);
-                        _b = (_a = fs_1.promises).open;
-                        return [4 /*yield*/, this.getThumbsImagePath()];
-                    case 3: return [4 /*yield*/, _b.apply(_a, [_e.sent(), "w+"])];
-                    case 4:
-                        newData = _e.sent();
-                        _d = (_c = newData).write;
-                        return [4 /*yield*/, (0, sharp_1.default)(this.getImagePath()).resize(this.width, this.height).toBuffer()];
-                    case 5: return [4 /*yield*/, _d.apply(_c, [_e.sent()])];
+                        return [4 /*yield*/, fs_1.promises.open(this.getThumbsImagePath(), "w+")];
+                    case 3:
+                        newData = _c.sent();
+                        console.log("Input: " + this.width + " - " + this.height);
+                        _b = (_a = newData).write;
+                        return [4 /*yield*/, (0, sharp_1.default)(this.getImagePath()).resize((this.width), (this.height)).toBuffer()];
+                    case 4: return [4 /*yield*/, _b.apply(_a, [_c.sent()])];
+                    case 5:
+                        _c.sent();
+                        newData.close();
+                        return [3 /*break*/, 7];
                     case 6:
-                        _e.sent();
-                        return [2 /*return*/, Promise.resolve(this)];
-                    case 7:
                         console.log("Image " + this.getThumbsImagePath() + " already exists. Rendering existing cached image...");
-                        return [2 /*return*/, Promise.resolve(this)]; // or just return this which is implicitly a Promies<Image>
+                        _c.label = 7;
+                    case 7: return [2 /*return*/, Promise.resolve(this)]; // or just return this which is implicitly a Promies<Image>
                     case 8:
-                        err_1 = _e.sent();
+                        err_1 = _c.sent();
                         console.log("Error: " + err_1);
                         return [2 /*return*/, Promise.reject(this)];
                     case 9: return [2 /*return*/];
@@ -166,26 +177,51 @@ var Image = /** @class */ (function () {
     ;
     return Image;
 }());
-images.get('/', function (req, res) {
-    console.log('Images API route');
-    try {
-        var queryParamImage = (req.query.image || "");
-        var queryParamWidth = (req.query.width || 0);
-        var queryParamHeight = (req.query.height || 0);
-        var img = new Image(queryParamImage, queryParamWidth, queryParamHeight);
-        console.log(img);
-        if (img.getImage() != "" && img.checkImage()) {
-            img.sharpImage();
-            console.log("Processed image " + img.getImage() + "!");
+images.get('/', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var queryParamImage, queryParamWidth, queryParamHeight, img, e_2;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                console.log('Images API route');
+                _a.label = 1;
+            case 1:
+                _a.trys.push([1, 8, , 9]);
+                queryParamImage = req.query.image;
+                queryParamWidth = req.query.width;
+                queryParamHeight = req.query.height;
+                if (!(req.query.image && req.query.width && req.query.height)) return [3 /*break*/, 6];
+                img = new Image(queryParamImage, parseInt(queryParamWidth), parseInt(queryParamHeight));
+                console.log(img);
+                return [4 /*yield*/, img.checkImage()];
+            case 2:
+                if (!_a.sent()) return [3 /*break*/, 4];
+                return [4 /*yield*/, img.sharpImage()];
+            case 3:
+                _a.sent();
+                console.log("Processed image " + img.getImage() + "!");
+                res.set('Connection', 'close');
+                res.status(200).render('pages/images', { imagefile: img.getThumbsImageRelativePath() + "/" + img.getThumbsImage() + ".jpg" });
+                return [3 /*break*/, 5];
+            case 4:
+                console.log("Image not found!");
+                res.set('Connection', 'close');
+                res.status(400).send("Image not found!");
+                _a.label = 5;
+            case 5: return [3 /*break*/, 7];
+            case 6:
+                console.log("Missing URL params!");
+                res.set('Connection', 'close');
+                res.status(400).send("Image not found!");
+                _a.label = 7;
+            case 7: return [3 /*break*/, 9];
+            case 8:
+                e_2 = _a.sent();
+                console.log("Error at endpoint /api/images:", e_2);
+                res.set('Connection', 'close');
+                res.status(500).send("Image not found!");
+                return [3 /*break*/, 9];
+            case 9: return [2 /*return*/];
         }
-        else {
-            console.log("Image not found!");
-        }
-        res.render('pages/images', { imagefile: img.getThumbsImageRelativePath() + "/" + img.getThumbsImage() + ".jpg" });
-    }
-    catch (e) {
-        console.log("Error at endpoint /api/images");
-        res.send("KO!");
-    }
-});
+    });
+}); });
 module.exports = images;

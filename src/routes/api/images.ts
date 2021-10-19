@@ -21,7 +21,7 @@ class Image {
   /*
   Constructor
   */
-  public constructor(
+  public constructor (
     image: string,
     width: number,
     height: number,
@@ -59,14 +59,24 @@ class Image {
     return `${REL_SAVED_THUMBS_FOLDER}`;
   }
 
-  private checkFile = async (fullpath: string) => {
-    await fs.stat(fullpath).catch(e => false);
+  private checkFile = async (fullpath: string): Promise<boolean> => {
+    console.log("checkFile call...");
+    try {
+      let check = await fs.stat(fullpath);
+      console.log(check, check.isFile());
+      if(check.isFile())
+        return Promise.resolve(true);
+      return Promise.resolve(false);
+    }
+    catch (e) {
+      console.log(e)
+      return Promise.resolve(false);
+    }
   }
 
   public async checkImage(): Promise<boolean> {
     console.log(`Checking image ${this.getImagePath()}`)
-    await this.checkFile(this.getImagePath());
-    return Promise.resolve(true);
+    return await this.checkFile(this.getImagePath());
     /*if(fsAsync.existsSync(this.getImagePath())) {
       console.log(`Image ${this.getImagePath()} exists.`)
       return true;
@@ -79,8 +89,7 @@ class Image {
 
   public async checkThumbsImage(): Promise<boolean> {
     console.log(`Checking image ${this.getThumbsImagePath()}`)
-    await this.checkFile(this.getThumbsImagePath());
-    return Promise.resolve(true);
+    return await this.checkFile(this.getThumbsImagePath());
     /*if(fsAsync.existsSync(this.getThumbsImagePath())) {
       console.log(`Image ${this.getThumbsImagePath()} exists.`);
       return true;
@@ -94,52 +103,66 @@ class Image {
   public async sharpImage(): Promise<Image> {
     console.log(`Resizing image ${this.image} into ${this.getThumbsImagePath()}`)
     try {
-      if(await this.checkThumbsImage()) { // TO-FIX: checkThumbsImage is not an async function. Missing await means that the check is skipped
+      if(!await this.checkThumbsImage()) {
         console.log(`Image ${this.image} does not exist. Processing...`);
         console.log(`Width: ${this.width} | Height: ${this.height}`);
-        let newData = await fs.open(await this.getThumbsImagePath(), "w+");
+        let newData = await fs.open(this.getThumbsImagePath(), "w+");
+        console.log(`Input: ${this.width} - ${this.height}`)
         await newData.write(
           await sharp(
             this.getImagePath()
-          ).resize((this.width as number), (this.height as number)).toBuffer()
-        );
-        return Promise.resolve(this);
+          ).resize((this.width), (this.height)).toBuffer()
+        )
+        newData.close();
       }
-  
-      console.log(`Image ${this.getThumbsImagePath()} already exists. Rendering existing cached image...`);
+      else {
+        console.log(`Image ${this.getThumbsImagePath()} already exists. Rendering existing cached image...`);
+      }
+
       return Promise.resolve(this); // or just return this which is implicitly a Promies<Image>
     }
     catch (err) {
       console.log("Error: " + err);
       return Promise.reject(this);
     }
-    
   };
 }
 
-images.get('/', (req, res) => {
+images.get('/', async (req, res) => {
   console.log('Images API route');
   try {
-    let queryParamImage = (req.query.image || "" as string);
-    let queryParamWidth = (req.query.width || 0 as number);
-    let queryParamHeight = (req.query.height || 0 as number);
-    const img = new Image(
-      (queryParamImage as string),
-      (queryParamWidth as number),
-      (queryParamHeight as number)
-    );
-    console.log(img);
-    if(img.getImage() != "" && img.checkImage()) {
-      img.sharpImage();
-      console.log(`Processed image ${img.getImage()}!`);
+    let queryParamImage = req.query.image as string;
+    let queryParamWidth = req.query.width as string;
+    let queryParamHeight = req.query.height as string;
+    if(req.query.image && req.query.width && req.query.height) {
+      const img = new Image (
+        queryParamImage,
+        parseInt(queryParamWidth),
+        parseInt(queryParamHeight)
+      );
+      console.log(img);
+      if(await img.checkImage()) {
+        await img.sharpImage();
+        console.log(`Processed image ${img.getImage()}!`);
+        res.set('Connection', 'close');
+        res.status(200).render('pages/images', {imagefile: `${img.getThumbsImageRelativePath()}/${img.getThumbsImage()}.jpg`});
+      }
+      else {
+        console.log("Image not found!");
+        res.set('Connection', 'close');
+        res.status(400).send("Image not found!");
+      }
     }
     else {
-      console.log("Image not found!");
+      console.log("Missing URL params!");
+      res.set('Connection', 'close');
+      res.status(400).send("Image not found!");
     }
-    res.render('pages/images', {imagefile: `${img.getThumbsImageRelativePath()}/${img.getThumbsImage()}.jpg`});
+    
   } catch (e) {
-    console.log("Error at endpoint /api/images");
-    res.send("KO!");
+    console.log("Error at endpoint /api/images:", e);
+    res.set('Connection', 'close');
+    res.status(500).send("Image not found!");
   }
 });
 

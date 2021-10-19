@@ -29,6 +29,7 @@
     "prettier": "prettier --config .prettierrc 'src/**/*.ts' --write",
     "linter": "eslint . --ext .ts",
     "jasmine": "jasmine",
+    "dev": "ts-node src/index",
     "start": "npm run build && npm run jasmine && node build/index"
   },
   "repository": {
