@@ -18,9 +18,10 @@ app.set('view engine', 'ejs');
 app.use('/api', express_1.default.static('assets'));
 app.get('/', function (req, res) {
     console.log('/ - Go to /api/images for the Image Processing API.');
-    res.send('/ - Go to /api/images for the Image Processing API.');
+    res.status(200).send('/ - Go to /api/images for the Image Processing API.');
 });
 app.use('/api', index_1.default);
 app.listen(port, function () {
     console.log("Server started at http://localhost:" + port);
 });
+exports.default = app;

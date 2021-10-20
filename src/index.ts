@@ -19,10 +19,12 @@ app.use('/api', express.static('assets'));
 
 app.get('/', (req, res) => {
   console.log('/ - Go to /api/images for the Image Processing API.');
-  res.send('/ - Go to /api/images for the Image Processing API.');
+  res.status(200).send('/ - Go to /api/images for the Image Processing API.');
 });
 app.use('/api', routes);
 
 app.listen(port, () => {
   console.log(`Server started at http://localhost:${port}`);
 });
+
+export default app;

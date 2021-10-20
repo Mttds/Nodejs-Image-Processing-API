@@ -7,7 +7,7 @@ const routes = express.Router();
 
 routes.get('/', logger, (req, res) => {
   console.log('/api - Go to /api/images for the Image Processing API.');
-  res.send('/api - Go to /api/images for the Image Processing API.')
+  res.status(200).send('/api - Go to /api/images for the Image Processing API.')
 });
 routes.use('/images', images);
 
