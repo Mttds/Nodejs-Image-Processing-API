@@ -7,11 +7,13 @@
 - width: the width of the desired resizing as an integer
 - height: the height of the desired resizing as an integer
 
-For example: http://localhost:3001/api/images/image=santamonica&height=200&width=200
+For example: http://localhost:3001/api/images?image=encenadaport&height=200&width=200
 
 This will create the resized image with the name <image>_<width>_<height>.jpg in the assets/image-uploader/thumbs folder.
 
 If the requested for the requested resizing there is already an image in the thumbs folder the image processing is skipped and the cached image is displayed instead.
+
+To start the processing you should copy or move the original image you want to resize in the assets/image-uploader/in folder.
 
 ## npm scripts
 

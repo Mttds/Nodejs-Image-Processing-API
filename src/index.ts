@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 import express from 'express';
 import routes from './routes/index';
 import ejs from 'ejs';
@@ -17,13 +17,13 @@ app.set('view engine', 'ejs');
 // api/images routes has the get('/'...) relative to api
 app.use('/api', express.static('assets'));
 
-app.get('/', (req, res) => {
+app.get('/', (req, res): void => {
   console.log('/ - Go to /api/images for the Image Processing API.');
   res.status(200).send('/ - Go to /api/images for the Image Processing API.');
 });
 app.use('/api', routes);
 
-app.listen(port, () => {
+app.listen(port, (): void => {
   console.log(`Server started at http://localhost:${port}`);
 });
 
