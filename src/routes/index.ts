@@ -5,7 +5,7 @@ import logger from '../middleware/logger';
 import images from './api/images';
 const routes = express.Router();
 
-routes.get('/', logger, (req, res) => {
+routes.get('/', logger, (req, res): void => {
   console.log('/api - Go to /api/images for the Image Processing API.');
   res
     .status(200)

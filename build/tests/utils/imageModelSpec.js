@@ -39,62 +39,28 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var supertest_1 = __importDefault(require("supertest"));
-var index_1 = __importDefault(require("../index"));
+var imageModel_1 = __importDefault(require("../../utils/imageModel"));
 var fs_1 = __importDefault(require("fs"));
 var path_1 = __importDefault(require("path"));
 var PROJECT_FOLDER = process.env.PWD;
-var request = (0, supertest_1.default)(index_1.default);
-describe('Endpoint tests', function () {
-    it('Gets the api endpoint', function () { return __awaiter(void 0, void 0, void 0, function () {
-        var response;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0: return [4 /*yield*/, request.get('/api/images?image=invalid&width=100&height=100')];
-                case 1:
-                    response = _a.sent();
-                    expect(response.status).toBe(400);
-                    return [2 /*return*/];
-            }
-        });
-    }); });
-    it('Gets the api/images endpoint with a non existing image param', function () { return __awaiter(void 0, void 0, void 0, function () {
-        var response;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0: return [4 /*yield*/, request.get('/api/images')];
-                case 1:
-                    response = _a.sent();
-                    expect(response.status).toBe(400);
-                    return [2 /*return*/];
-            }
-        });
-    }); });
-    it('Gets the api/images endpoint with an existing image', function () { return __awaiter(void 0, void 0, void 0, function () {
-        var response;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
+describe('Image class testing', function () {
+    it('Resizes an image and checks its existence in the thumbs folder', function () { return __awaiter(void 0, void 0, void 0, function () {
+        var img, _a;
+        return __generator(this, function (_b) {
+            switch (_b.label) {
                 case 0:
-                    fs_1.default.copyFile(path_1.default.join(PROJECT_FOLDER, '/assets', '/image-uploader', 'encenadaport.jpg'), path_1.default.join(PROJECT_FOLDER, '/assets', '/image-uploader', '/in', 'encenadaport.jpg'), function (err) {
+                    img = new imageModel_1.default("encenadaport", parseInt('100'), parseInt('200'));
+                    fs_1.default.copyFile(path_1.default.join(PROJECT_FOLDER, '/assets', '/image-uploader', 'encenadaport.jpg'), img.getImagePath(), function (err) {
                         if (err)
                             throw err;
                     });
-                    return [4 /*yield*/, request.get('/api/images?image=encenadaport&width=100&height=100')];
+                    return [4 /*yield*/, img.sharpImage()];
                 case 1:
-                    response = _a.sent();
-                    expect(response.status).toBe(200);
-                    return [2 /*return*/];
-            }
-        });
-    }); });
-    it('Gets the api/images endpoint with an existing image and request an already cached image', function () { return __awaiter(void 0, void 0, void 0, function () {
-        var response;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0: return [4 /*yield*/, request.get('/api/images?image=encenadaport&width=100&height=100')];
-                case 1:
-                    response = _a.sent();
-                    expect(response.status).toBe(200);
+                    _b.sent();
+                    _a = expect;
+                    return [4 /*yield*/, img.checkThumbsImage()];
+                case 2:
+                    _a.apply(void 0, [_b.sent()]).toBe(true);
                     return [2 /*return*/];
             }
         });
